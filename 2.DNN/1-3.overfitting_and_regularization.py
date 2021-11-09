@@ -21,7 +21,7 @@ train_loader = torch.utils.data.DataLoader(
                         transforms.ToTensor(),
                         transforms.Normalize((0.1307,),(0.3081,))
                     ])),
-    batch_size= BATCH_SIZE,shuffle = True
+    batch_size= BATCH_SIZE,shuffle = True, num_workers=4
 )
 test_loader = torch.utils.data.DataLoader(
     datasets.MNIST('./data/',
@@ -51,8 +51,6 @@ class Net(nn.Module):
         x = self.fc3(x)
         return x
 
-model = Net(dropout_p=0.2).to(DEVICE)
-optimizer = optim.SGD(model.parameters(), lr=0.01)
 
 def train(model, train_loader, optimizer):
     model.train()
@@ -80,8 +78,11 @@ def evaluate(model, test_loader):
     test_accuracy = 100. * correct / len(test_loader.dataset)
     return test_loss, test_accuracy
 
-for epoch in range(1, EPOCHS + 1):
-    train(model, train_loader, optimizer)
-    test_loss, test_accuracy = evaluate(model, test_loader)
+if __name__ == '__main__':
+    model = Net(dropout_p=0.2).to(DEVICE)
+    optimizer = optim.SGD(model.parameters(), lr=0.01)
+    for epoch in range(1, EPOCHS + 1):
+        train(model, train_loader, optimizer)
+        test_loss, test_accuracy = evaluate(model, test_loader)
 
-    print('[{}] Test Loss: {:.4f}, Accuracy: {:.2f}%'.format(epoch, test_loss, test_accuracy))
+        print('[{}] Test Loss: {:.4f}, Accuracy: {:.2f}%'.format(epoch, test_loss, test_accuracy))
