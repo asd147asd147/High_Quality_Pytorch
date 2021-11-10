@@ -5,6 +5,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.types import Device
 from torchvision import transforms, datasets
+import time
 
 USE_CUDA = torch.cuda.is_available()
 DEVICE = torch.device("cuda" if USE_CUDA else "cpu")
@@ -81,8 +82,11 @@ def evaluate(model, test_loader):
 if __name__ == '__main__':
     model = Net(dropout_p=0.2).to(DEVICE)
     optimizer = optim.SGD(model.parameters(), lr=0.01)
+    t = time.time()
     for epoch in range(1, EPOCHS + 1):
         train(model, train_loader, optimizer)
         test_loss, test_accuracy = evaluate(model, test_loader)
 
         print('[{}] Test Loss: {:.4f}, Accuracy: {:.2f}%'.format(epoch, test_loss, test_accuracy))
+
+    print(time.time() - t)
